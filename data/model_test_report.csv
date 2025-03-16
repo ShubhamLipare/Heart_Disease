@@ -1,0 +1,5 @@
+,accuracy
+Decision Tree,0.7704918032786885
+Random Forest,0.8524590163934426
+Support Vector Classifier (SVC),0.8524590163934426
+K-Nearest Neighbors (KNN),0.9344262295081968
