@@ -13,9 +13,9 @@ from sklearn.metrics import accuracy_score
 from src.component.data_transformation import DataTransformation
 
 class ModelTrainerConfig:
-    def __init__(self,trained_model_file_path:str=os.path.join("data","model.pkl"),
-                 model_train_report_path:str=os.path.join("data","model_trainer_report.csv"),
-                 model_test_report_path:str=os.path.join("data","model_test_report.csv")):
+    def __init__(self,trained_model_file_path:str=os.path.join("artifacts","model.pkl"),
+                 model_train_report_path:str=os.path.join("artifacts","model_trainer_report.csv"),
+                 model_test_report_path:str=os.path.join("artifacts","model_test_report.csv")):
         
         self.trained_model_file_path=trained_model_file_path
         self.model_train_report_path=model_train_report_path
@@ -25,11 +25,8 @@ class ModelTrainer:
     def __init__(self):
         self.model_trainer_config=ModelTrainerConfig()
 
-    def initiate_model_trainer(self, train_arr, test_arr):
+    def initiate_model_trainer(self, x_train,y_train,x_test, y_test):
         try:
-            x_train, x_test, y_train, y_test = train_arr[:, :-1], test_arr[:, :-1], train_arr[:, -1], test_arr[:, -1]
-            logging.info("Train-test split completed")
-
             models = {
                 "Decision Tree": DecisionTreeClassifier(),
                 "Random Forest": RandomForestClassifier(),
@@ -93,11 +90,3 @@ class ModelTrainer:
         except Exception as e:
             raise CustomException(e, sys)
         
-if __name__=="__main__":
-    model_trainer=ModelTrainer()
-    transformer=DataTransformation()
-    train_data = pd.read_csv(r"G:\Resume projects\Heart dieses\data\train.csv")
-    test_data = pd.read_csv(r"G:\Resume projects\Heart dieses\data\test.csv") 
-    train_arr, test_arr = transformer.initiate_data_transformation_object(train_data, test_data)
-    score=model_trainer.initiate_model_trainer(train_arr,test_arr)
-    print(score)

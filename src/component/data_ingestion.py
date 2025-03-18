@@ -7,8 +7,18 @@ from src.logger import logging
 import sys
 from sklearn.model_selection import train_test_split
 
+class DataInjestionConfig:
+    def __init__(self,source_data_path:str=os.path.join("artifacts","source.csv"),
+                 train_data_path:str=os.path.join("artifacts","train.csv"),
+                 test_data_path:str=os.path.join("artifacts","test.csv")):
+        self.source_data_path=source_data_path
+        self.train_data_path=train_data_path
+        self.test_data_path=test_data_path
+
+
 class DataInjestion:
     def __init__(self):
+        self.data_injestion_config=DataInjestionConfig()
         load_dotenv()
         self.user=os.getenv("USER")
         self.password=os.getenv("PASSWORD")
@@ -32,23 +42,15 @@ class DataInjestion:
 
             train_data,test_data=train_test_split(df,test_size=0.2,random_state=42)
 
-            with open("data/train.csv","w") as file:
-                train_data.to_csv(file,index=False)
-            with open("data/test.csv","w") as file:
-                test_data.to_csv(file,index=False)
+            os.makedirs(os.path.dirname(self.data_injestion_config.source_data_path),exist_ok=True)
+            logging.info("artifacts folder created")
 
-            os.makedirs("data",exist_ok=True)
-            with open("data/source.csv","w") as file:
-                df.to_csv(file,index=False)
-            logging.info("source data is stored in /data path")
-            return (df,train_data,test_data)
+            df.to_csv(self.data_injestion_config.source_data_path,index=False,header=True)
+            logging.info(f"source data is stored at {self.data_injestion_config.source_data_path}")
+
+            train_data.to_csv(self.data_injestion_config.train_data_path,index=False,header=True)
+            test_data.to_csv(self.data_injestion_config.test_data_path,index=False,header=True)
+
+            return (self.data_injestion_config.train_data_path,self.data_injestion_config.test_data_path)
         except Exception as e:
             raise CustomException(e,sys)
-
-
-
-if __name__=="__main__":
-    injestion=DataInjestion()
-    injestion.connect_to_db()
-    df,train,test=injestion.fetch_data()
-    print(df.head())

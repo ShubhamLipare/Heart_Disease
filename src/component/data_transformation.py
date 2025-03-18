@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import pickle
 from src.logger import logging
 from src.exception import CustomException
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -10,9 +9,17 @@ from sklearn.pipeline import Pipeline
 import sys
 from src.util import save_object  # Ensure `save_object` exists
 
+class DataTransformationConfig:
+    def __init__(self,preprocessor_path:str=os.path.join("artifacts","preprocessor.pkl"),
+                 x_train_transformed_path:str=os.path.join("artifacts","x_train_transformed.csv"),
+                 x_test_transformed_path:str=os.path.join("artifacts","x_test_transformed.csv")):
+        self.preprocessor_path=preprocessor_path
+        self.x_train_transformed_path=x_train_transformed_path
+        self.x_test_transformed_path=x_test_transformed_path
+
 class DataTransformation:
     def __init__(self):
-        pass
+        self.data_transformation_config=DataTransformationConfig()
 
     def get_data_transformation_object(self):
         encoding_col = ['cp', 'restecg', 'thal', "slope", "ca"]
@@ -34,47 +41,44 @@ class DataTransformation:
 
         return preprocessing
 
-    def initiate_data_transformation_object(self, train, test):
+    def initiate_data_transformation_object(self, train_path, test_path):
         try:
+            train_df=pd.read_csv(train_path)
+            test_df=pd.read_csv(test_path)
+            logging.info("Read train and test csv files")
+
             logging.info("Dropping 'id' column from train and test data")
-            train = train.drop(columns=["id"], errors="ignore")
-            test = test.drop(columns=["id"], errors="ignore")
+            train_df = train_df.drop(columns=["id"], errors="ignore")
+            test_df = test_df.drop(columns=["id"], errors="ignore")
 
             preprocessor = self.get_data_transformation_object()
             logging.info("Preprocessor object initiated")
 
-            train_transformed = preprocessor.fit_transform(train)
-            test_transformed = preprocessor.transform(test)
+            x_train,y_train=train_df.drop("target",axis=1),train_df["target"]
+            x_test,y_test=test_df.drop("target",axis=1),test_df["target"]
+
+            x_train_transformed = preprocessor.fit_transform(x_train)
+            x_test_transformed = preprocessor.transform(x_test)
             logging.info("Transformation applied to train and test data")
 
             # Extract transformed column names
             transformed_columns = preprocessor.get_feature_names_out()
-            train_transformed_csv = pd.DataFrame(train_transformed, columns=transformed_columns)
-            test_transformed_csv = pd.DataFrame(test_transformed, columns=transformed_columns)
+            train_transformed_csv = pd.DataFrame(x_train_transformed, columns=transformed_columns)
+            test_transformed_csv = pd.DataFrame(x_test_transformed, columns=transformed_columns)
 
-            # Ensure data folder exists
-            os.makedirs("data", exist_ok=True)
-
+            os.makedirs(os.path.dirname(self.data_transformation_config.x_train_transformed_path), exist_ok=True)#creating artifacts folder
             # Save transformed data
-            train_transformed_csv.to_csv("data/train_transformed.csv", index=False)
-            test_transformed_csv.to_csv("data/test_transformed.csv", index=False)
-            logging.info("Transformed data is stored in 'data/' path")
+            train_transformed_csv.to_csv(self.data_transformation_config.x_train_transformed_path, index=False)
+            test_transformed_csv.to_csv(self.data_transformation_config.x_test_transformed_path, index=False)
+            logging.info("Transformed data is stored in 'artifacts' path")
 
             # Save the preprocessor object
-            pickle_path = os.path.join("data", "preprocessor.pkl")
-            save_object(pickle_path, preprocessor)
-            logging.info(f"Preprocessor saved as {pickle_path}")
+            save_object(self.data_transformation_config.preprocessor_path, preprocessor)
+            logging.info(f"Preprocessor saved at {self.data_transformation_config.preprocessor_path}")
 
-            return train_transformed, test_transformed
+            return (x_train_transformed,y_train,
+                    x_test_transformed,y_test)
         
         except Exception as e:
             raise CustomException(e,sys)
 
-if __name__ == "__main__":
-    transformer = DataTransformation()
-    train_data = pd.read_csv(r"G:\Resume projects\Heart dieses\data\train.csv")
-    test_data = pd.read_csv(r"G:\Resume projects\Heart dieses\data\test.csv")
-    
-    train_transformed, test_transformed = transformer.initiate_data_transformation_object(train_data, test_data)
-
-    print("Data transformation completed. Transformed files are saved in the 'data/' folder.")

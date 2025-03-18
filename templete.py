@@ -11,11 +11,8 @@ list_of_files=[
     f"src/component/data_transformation.py",
     f"src/component/model_trainer.py",
     f"src/component/model_evaluation.py",
-    f"src/component/model_monitoring.py",
     f"src/pipeline/__init__.py",
     f"src/pipeline/predict_pipeline.py",
-    f"src/pipeline/train_pipeline.py",
-    f"src/pipeline/deployment.py",
     f"src/util.py",
     f"src/logger.py",
     f"src/exception.py",
@@ -25,10 +22,10 @@ list_of_files=[
     "main.py",
     "Dockerfile",
     "app.py",
+    "api.py",
     "main.py",
     "requirements.txt",
     "setup.py",
-    "research/trials.ipynb"
 ]
 
 for filepath in list_of_files:
