@@ -20,17 +20,3 @@ class PredictPipeline:
             return prediction
         except Exception as e:
             raise CustomException(e,sys)
-"""
-if __name__=="__main__":
-    input_dict = {
-    "features": [45, 1, 3, 140, 220, 0, 1, 150, 0, 2.3, 0, 0, 1]}
-
-    # Define column names (replace with actual feature names)
-    columns = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"]
-
-    # Convert to DataFrame
-    input_df = pd.DataFrame([input_dict["features"]], columns=columns)
-    pipeline=PredictPipeline()
-    result=pipeline.predict(input_df)
-    print(result)
-    """

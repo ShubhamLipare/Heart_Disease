@@ -1,0 +1,14 @@
+pandas
+numpy
+scikit-learn
+mlflow
+sqlalchemy
+python-dotenv
+cx_Oracle
+fastapi
+uvicorn
+streamlit
+requests
+pydantic
+
+
