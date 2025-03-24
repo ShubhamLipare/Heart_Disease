@@ -25,6 +25,9 @@ def predict(request: PredictionRequest):
         # Load Prediction Pipeline
         predict_pipeline = PredictPipeline()
         prediction = predict_pipeline.predict(input_data)
+        
+        mlflow.set_tracking_uri("https://heart-disease-mlflow.onrender.com") # http://localhost:5000
+        mlflow.set_experiment("Heart Disease Prediction")
 
         # Log inference in MLflow
         with mlflow.start_run():
