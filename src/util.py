@@ -25,7 +25,7 @@ def evaluate_model(x_train, x_test, y_train, y_test, models, params):
         test_report = {}
         best_models = {}
 
-        mlflow.set_tracking_uri("http://localhost:5000")
+        mlflow.set_tracking_uri("https://heart-disease-mlflow.onrender.com") # http://localhost:5000
         mlflow.set_experiment("Heart Disease Prediction")
 
         for model_name, model in models.items():
