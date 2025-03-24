@@ -43,7 +43,7 @@ def main():
     
     if st.button("Predict Heart Disease"):        
         try:
-            response = requests.post("http://localhost:8000/predict", json=input_data) 
+            response = requests.post("https://heart-disease-api-0g3d.onrender.com/predict", json=input_data) #http://localhost:8000 
             
             if response.status_code == 200:
                 result = response.json()["prediction"]
